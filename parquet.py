@@ -31,3 +31,37 @@ print(f'Size of Parquet file (GZIP): {parquet_second_size / 1024:.2f} KB \n')
 print(df.head(), '\n')
 print(df2.head(), '\n')
 print(df3.head(), '\n')
+
+
+#### Runtime Comparisons
+
+import time
+
+## csv-file
+
+start = time.time()
+csv_df = pd.read_csv('snew_precincts.csv')
+
+len_csv = len(csv_df)
+csv_df['Ballots Counted'] = pd.to_numeric(csv_df['Ballots Counted'], errors='coerce').fillna(0).astype(int)
+sum_ballots_csv = csv_df['Ballots Counted'].sum()
+mean_dems_by_county = csv_df.groupby('County Name')['Ballots Counted'].mean()
+
+print('Sum: ',sum_ballots_csv)
+print('Time taken for CSV-analytics: ', time.time() - start)
+
+
+
+## parquet-file
+
+start = time.time()
+parquet_df = pd.read_parquet('output.parquet')
+
+len_csv = len(parquet_df)
+parquet_df['Ballots Counted'] = pd.to_numeric(parquet_df['Ballots Counted'], errors='coerce').fillna(0).astype(int)
+sum_ballots_parquet = parquet_df['Ballots Counted'].sum()
+mean_dems_by_county = parquet_df.groupby('County Name')['Ballots Counted'].mean()
+
+print('\nSum: ', sum_ballots_parquet)
+print('Time taken for Parquet-analytics: ', time.time() - start, '\n')
+    
